@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brighton Weather - Stage 1</title>
+</head>
+<body>
+  <!-- Town name container -->
+  <h1 id="town-name"></h1>
+
+  <!-- API forecast URL link -->
+  <p>
+    API Request URL:
+    <a id="api-link" href="#" target="_blank" rel="noopener noreferrer">Loading link...</a>
+  </p>
+
+  <!-- Required attribution credit for Open-Meteo -->
+  <p><small>Weather data by Open-Meteo.com</small></p>
+
+  <script>
+    // Configuration settings for location.
+    // Note: Open-Meteo does not require an API key, but if an API key were needed, this is where it would go.
+    const CONFIG = {
+      town: "Brighton",
+      latitude: 50.8284,
+      longitude: -0.1395
+    };
+
+    // Builds the Open-Meteo forecast API URL using string concatenation (+)
+    function buildUrl() {
+      const url = "https://api.open-meteo.com/v1/forecast" +
+        "?latitude=" + CONFIG.latitude +
+        "&longitude=" + CONFIG.longitude +
+        "&current=temperature_2m,weather_code,wind_speed_10m" +
+        "&timezone=Europe%2FLondon";
+      return url;
+    }
+
+    // Displays the town name and configures the API link on the page
+    function initStage1() {
+      // Show town name
+      const townElement = document.getElementById("town-name");
+      townElement.textContent = CONFIG.town;
+
+      // Generate the URL and set it to the link
+      const apiUrl = buildUrl();
+      const linkElement = document.getElementById("api-link");
+      linkElement.href = apiUrl;
+      linkElement.textContent = apiUrl;
+    }
+
+    // Run when the page content is loaded
+    initStage1();
+  </script>
+</body>
+</html>
