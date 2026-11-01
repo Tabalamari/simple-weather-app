@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brighton Weather - Stage 3</title>
+  <title>Brighton Weather - Stage 4</title>
 </head>
 <body>
-  <h1>Weather Info</h1>
+  <h1>Weather in <span id="town"></span></h1>
 
-  <!-- Spans to display extracted weather data -->
-  <p>Town: <span id="town"></span></p>
-  <p>Weather code: <span id="weather-code"></span></p>
+  <!-- Button to refresh weather data -->
+  <button id="refresh-button">Refresh data</button>
+
+  <!-- Weather data display -->
+  <p>Weather: <span id="weather-description"></span></p>
   <p>Temperature: <span id="temperature"></span></p>
-  <p>Time: <span id="time"></span></p>
+  <p>Last updated: <span id="time"></span></p>
 
   <!-- Error message container (shown if fetch fails) -->
   <p id="error-message" style="color: red;"></p>
@@ -39,12 +41,41 @@
       return url;
     }
 
-    // Displays the parsed weather values in separate spans unformatted
+    // Turns ISO date string like "2026-10-28T12:45" into "28/10/2026 12:45" using split
+    function formatDate(dateString) {
+      const parts = dateString.split("T");
+      const dateParts = parts[0].split("-");
+      const timePart = parts[1];
+      return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0] + " " + timePart;
+    }
+
+    // Converts WMO weather code into human-readable text
+    function describeWeather(code) {
+      if (code === 0) {
+        return "Clear sky";
+      } else if (code >= 1 && code <= 3) {
+        return "Cloudy";
+      } else if (code >= 45 && code <= 48) {
+        return "Fog";
+      } else if (code >= 51 && code <= 67) {
+        return "Rain";
+      } else if (code >= 71 && code <= 77) {
+        return "Snow";
+      } else if (code >= 80 && code <= 82) {
+        return "Rain showers";
+      } else if (code >= 95) {
+        return "Thunderstorm";
+      } else {
+        return "Unknown";
+      }
+    }
+
+    // Displays the formatted weather data on the page
     function showWeather(data) {
       document.getElementById("town").textContent = CONFIG.town;
-      document.getElementById("weather-code").textContent = data.current.weather_code;
-      document.getElementById("temperature").textContent = data.current.temperature_2m;
-      document.getElementById("time").textContent = data.current.time;
+      document.getElementById("weather-description").textContent = describeWeather(data.current.weather_code);
+      document.getElementById("temperature").textContent = data.current.temperature_2m + " °C";
+      document.getElementById("time").textContent = formatDate(data.current.time);
     }
 
     // Loads the weather data using fetch and handles errors with try and catch
@@ -65,7 +96,10 @@
       }
     }
 
-    // Run automatically on page load
+    // Set up button event listener and initial weather load
+    document.getElementById("refresh-button").addEventListener("click", loadWeather);
+
+    // Initial load when the page opens
     loadWeather();
   </script>
 </body>
