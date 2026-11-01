@@ -3,21 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brighton Weather - Stage 2</title>
+  <title>Brighton Weather - Stage 3</title>
 </head>
 <body>
-  <!-- Town name container -->
-  <h1 id="town-name"></h1>
+  <h1>Weather Info</h1>
 
-  <!-- API forecast URL link -->
-  <p>
-    API Request URL:
-    <a id="api-link" href="#" target="_blank" rel="noopener noreferrer">Loading link...</a>
-  </p>
+  <!-- Spans to display extracted weather data -->
+  <p>Town: <span id="town"></span></p>
+  <p>Weather code: <span id="weather-code"></span></p>
+  <p>Temperature: <span id="temperature"></span></p>
+  <p>Time: <span id="time"></span></p>
 
-  <!-- Container for displaying raw JSON data -->
-  <h2>Raw Weather Data:</h2>
-  <pre id="raw-json">Loading weather data...</pre>
+  <!-- Error message container (shown if fetch fails) -->
+  <p id="error-message" style="color: red;"></p>
 
   <!-- Required attribution credit for Open-Meteo -->
   <p><small>Weather data by Open-Meteo.com</small></p>
@@ -41,34 +39,34 @@
       return url;
     }
 
-    // Fetches the weather data from Open-Meteo API and displays the raw JSON in a pre tag
+    // Displays the parsed weather values in separate spans unformatted
+    function showWeather(data) {
+      document.getElementById("town").textContent = CONFIG.town;
+      document.getElementById("weather-code").textContent = data.current.weather_code;
+      document.getElementById("temperature").textContent = data.current.temperature_2m;
+      document.getElementById("time").textContent = data.current.time;
+    }
+
+    // Loads the weather data using fetch and handles errors with try and catch
     async function loadWeather() {
-      const url = buildUrl();
-      const response = await fetch(url);
-      const data = await response.json();
+      const errorElement = document.getElementById("error-message");
+      errorElement.textContent = "";
 
-      const rawJsonElement = document.getElementById("raw-json");
-      rawJsonElement.textContent = JSON.stringify(data, null, 2);
+      try {
+        const url = buildUrl();
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("HTTP error " + response.status);
+        }
+        const data = await response.json();
+        showWeather(data);
+      } catch (error) {
+        errorElement.textContent = "Could not load the weather.";
+      }
     }
 
-    // Initializes the page elements and triggers loading weather data on page load
-    function init() {
-      // Show town name
-      const townElement = document.getElementById("town-name");
-      townElement.textContent = CONFIG.town;
-
-      // Generate the URL and set it to the link
-      const apiUrl = buildUrl();
-      const linkElement = document.getElementById("api-link");
-      linkElement.href = apiUrl;
-      linkElement.textContent = apiUrl;
-
-      // Load weather data on page load
-      loadWeather();
-    }
-
-    // Run when the page loads
-    init();
+    // Run automatically on page load
+    loadWeather();
   </script>
 </body>
 </html>
