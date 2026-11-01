@@ -3,104 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brighton Weather - Stage 4</title>
+  <title>Weather App - Brighton & Beyond</title>
+  <!-- Link external CSS stylesheet -->
+  <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-  <h1>Weather in <span id="town"></span></h1>
+  <div class="weather-container">
+    <main class="weather-card">
+      <!-- Search Form to choose a town -->
+      <form id="search-form" class="search-form">
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="Search city (e.g. Lewes, London)..."
+          autocomplete="off"
+          required
+        >
+        <button type="submit" class="btn-primary" id="search-btn">Search</button>
+      </form>
 
-  <!-- Button to refresh weather data -->
-  <button id="refresh-button">Refresh data</button>
+      <!-- Weather Header (Town Name) -->
+      <header class="weather-header">
+        <h1 id="town" class="town-name">Brighton</h1>
+      </header>
 
-  <!-- Weather data display -->
-  <p>Weather: <span id="weather-description"></span></p>
-  <p>Temperature: <span id="temperature"></span></p>
-  <p>Last updated: <span id="time"></span></p>
+      <!-- Weather Graphic / Emoji -->
+      <div class="weather-icon-wrapper">
+        <span id="weather-icon" class="weather-emoji" aria-label="Weather icon">🌤️</span>
+      </div>
 
-  <!-- Error message container (shown if fetch fails) -->
-  <p id="error-message" style="color: red;"></p>
+      <!-- Temperature Display -->
+      <div class="temperature-wrapper">
+        <span id="temperature" class="temperature-value">--°C</span>
+      </div>
 
-  <!-- Required attribution credit for Open-Meteo -->
-  <p><small>Weather data by Open-Meteo.com</small></p>
+      <!-- Weather Condition Text -->
+      <div id="weather-description" class="weather-condition">Loading weather...</div>
 
-  <script>
-    // Configuration settings for location.
-    // Note: Open-Meteo does not require an API key, but if an API key were needed, this is where it would go.
-    const CONFIG = {
-      town: "Brighton",
-      latitude: 50.8284,
-      longitude: -0.1395
-    };
+      <!-- Details (Wind speed, Last updated) -->
+      <div class="weather-details">
+        <div class="detail-item">
+          <span class="detail-label">Wind Speed</span>
+          <span id="wind-speed" class="detail-value">-- km/h</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Last Updated</span>
+          <span id="time" class="detail-value">--/--/---- --:--</span>
+        </div>
+      </div>
 
-    // Builds the Open-Meteo forecast API URL using string concatenation (+)
-    function buildUrl() {
-      const url = "https://api.open-meteo.com/v1/forecast" +
-        "?latitude=" + CONFIG.latitude +
-        "&longitude=" + CONFIG.longitude +
-        "&current=temperature_2m,weather_code,wind_speed_10m" +
-        "&timezone=Europe%2FLondon";
-      return url;
-    }
+      <!-- Error box for feedback -->
+      <div id="error-message" class="error-box" role="alert"></div>
 
-    // Turns ISO date string like "2026-10-28T12:45" into "28/10/2026 12:45" using split
-    function formatDate(dateString) {
-      const parts = dateString.split("T");
-      const dateParts = parts[0].split("-");
-      const timePart = parts[1];
-      return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0] + " " + timePart;
-    }
+      <!-- Action: Refresh data button -->
+      <div class="card-actions">
+        <button id="refresh-button" class="btn-refresh">
+          🔄 Refresh data
+        </button>
+      </div>
+    </main>
 
-    // Converts WMO weather code into human-readable text
-    function describeWeather(code) {
-      if (code === 0) {
-        return "Clear sky";
-      } else if (code >= 1 && code <= 3) {
-        return "Cloudy";
-      } else if (code >= 45 && code <= 48) {
-        return "Fog";
-      } else if (code >= 51 && code <= 67) {
-        return "Rain";
-      } else if (code >= 71 && code <= 77) {
-        return "Snow";
-      } else if (code >= 80 && code <= 82) {
-        return "Rain showers";
-      } else if (code >= 95) {
-        return "Thunderstorm";
-      } else {
-        return "Unknown";
-      }
-    }
+    <!-- Required attribution credit for Open-Meteo -->
+    <footer class="attribution">
+      <small>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a></small>
+    </footer>
+  </div>
 
-    // Displays the formatted weather data on the page
-    function showWeather(data) {
-      document.getElementById("town").textContent = CONFIG.town;
-      document.getElementById("weather-description").textContent = describeWeather(data.current.weather_code);
-      document.getElementById("temperature").textContent = data.current.temperature_2m + " °C";
-      document.getElementById("time").textContent = formatDate(data.current.time);
-    }
-
-    // Loads the weather data using fetch and handles errors with try and catch
-    async function loadWeather() {
-      const errorElement = document.getElementById("error-message");
-      errorElement.textContent = "";
-
-      try {
-        const url = buildUrl();
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("HTTP error " + response.status);
-        }
-        const data = await response.json();
-        showWeather(data);
-      } catch (error) {
-        errorElement.textContent = "Could not load the weather.";
-      }
-    }
-
-    // Set up button event listener and initial weather load
-    document.getElementById("refresh-button").addEventListener("click", loadWeather);
-
-    // Initial load when the page opens
-    loadWeather();
-  </script>
+  <!-- Link external JavaScript logic -->
+  <script src="assets/js/app.js"></script>
 </body>
 </html>
